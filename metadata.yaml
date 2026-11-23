@@ -1,0 +1,18 @@
+name: astrbot_plugin_bililive_info
+display_name: 哔哩哔哩查直播 · 直播信息
+author: "GuiXiJiang"
+description: "【测试版】查询 B 站直播间数据并渲染成图片看板，支持礼物/SC/盲盒/上舰实时转发到群。数据来自汐汐工具箱，需配合汐汐工具箱使用。"
+tags:
+  - bilibili
+  - 直播
+  - 数据看板
+  - 直播转发
+  - 测试版
+  - Python
+category: 娱乐
+version: 0.0.1
+repo: "https://github.com/GuiXiJiangSuki/xixi-toolbox-release"
+support_platforms:
+  - aiocqhttp
+  - qq_official
+  - qq_official_webhook
