@@ -1,0 +1,26 @@
+{
+  "xl_xixi_url": {
+    "description": "汐汐工具箱地址",
+    "type": "string",
+    "default": "http://127.0.0.1:8800",
+    "hint": "汐汐工具箱主界面地址（不带结尾斜杠）。插件用它的 /bililive/api/ 接口做实时操作（送礼、发弹幕等）"
+  },
+  "xl_db_api_url": {
+    "description": "历史数据查询地址（推荐填）",
+    "type": "string",
+    "default": "http://127.0.0.1:8801",
+    "hint": "汐汐内置的历史数据库查询接口。填了能拿到完整统计（弹幕不截断、营收精确、大航海实付金额、开播时长）。这个服务跟主程序同一个进程，主程序活着它就在"
+  },
+  "xl_show_avatar": {
+    "description": "看板显示主播头像",
+    "type": "bool",
+    "default": true,
+    "hint": "在图片左上角显示主播头像"
+  },
+  "xl_relay_enabled": {
+    "description": "启用监听转发",
+    "type": "bool",
+    "default": true,
+    "hint": "开启后插件会连汐汐的转发通道，收到 礼物/醒目留言/盲盒/上舰 事件时按群规则推送。关掉则 /添加监听转发 不可用"
+  }
+}
