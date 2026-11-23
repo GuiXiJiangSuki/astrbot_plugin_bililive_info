@@ -109,6 +109,20 @@ def format_event(ev: dict) -> str | None:
     who = f"{uname}({uid})" if uid else uname
 
     if kind == "gift":
+        """
+        盲盒的礼物事件要跳过
+        ─────────────────────────────────────────────
+        开盲盒时汐汐会推两条事件：
+          · kind='gift'      带 isBlind=true / blindBox 字段
+          · kind='blindbox'  完整的开箱信息
+        只转发后者，否则群里会出现两条盲盒消息。
+
+        新版汐汐已经用 skipRelay 标记拦掉了，这里再兜一层，
+        兼容旧版汐汐（没升级的话也只会收到 blindbox 那条）。
+        """
+        if ev.get("skipRelay") or ev.get("isBlind") or ev.get("blindBox"):
+            return None
+
         act = str(_pick(ev, "action", default="投喂"))
         num = int(ev.get("num") or 1)
         name = str(_pick(ev, "giftName", "gift_name", default="礼物"))
@@ -129,22 +143,39 @@ def format_event(ev: dict) -> str | None:
         value = ev.get("value")
         profit = ev.get("profit")
         cost = ev.get("cost")
-        # 主要显示「开出什么」+ 价值；有盈亏时补一个盈亏标记
+        """
+        盲盒消息格式：
+            [盲盒] 小猪头奇犽(352034898)投喂了1个武器盲盒(¥9)，开出 鸭鸭装备(¥6)，亏3¥
+
+        组成：投喂了 N 个 <盲盒名>(<花费>) ，开出 <礼物名>(<价值>) ，<赚|亏><盈亏>¥
+        缺哪个字段就省略哪一段。
+        """
+        num = int(ev.get("num") or 1)
+
+        # ① 投喂部分：盲盒名 + 花费
+        cost_txt = f"(¥{_fmt_money(cost)})" if cost else ""
+        head = f"投喂了{num}个{box}{cost_txt}"
+
+        # ② 开出部分：礼物名 + 价值
+        val_txt = f"(¥{_fmt_money(value)})" if value else ""
+        out = f"，开出 {gift}{val_txt}" if gift else ""
+
+        # ③ 盈亏部分
         tail = ""
         if profit is not None:
             try:
                 p = float(profit)
-                tail = f"，{'赚' if p >= 0 else '亏'}{_fmt_money(abs(p))}"
+                sign = "赚" if p >= 0 else "亏"
+                tail = f"，{sign}{_fmt_money(abs(p))}¥"
             except (TypeError, ValueError):
                 tail = ""
-        val_txt = f"(¥{_fmt_money(value)})" if value else ""
-        return f"[盲盒] {who}投喂了1个{box}，开出 {gift}{val_txt}{tail}"
+
+        return f"[盲盒] {who}{head}{out}{tail}"
 
     if kind == "guard":
         lv = str(_pick(ev, "levelName", "guardName", default="舰长"))
-        price = ev.get("price")
-        tail = f"(¥{_fmt_money(price)})" if price else ""
-        return f"[上舰] {who}成为了{lv}{tail}"
+        # 上舰消息不带金额（用户要求：只显示谁成为了什么舰）
+        return f"[上舰] {who}成为了{lv}"
 
     return None
 
